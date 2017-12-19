@@ -1,6 +1,6 @@
 ---
 title: "Assignment 5 - Decision Trees"
-author: "Charles Lang"
+author: "Yang XU"
 date: "November 9, 2016"
 output: html_document
 ---
@@ -16,7 +16,8 @@ library(party)
 
 ## Part I
 ```{r}
-D1 <- 
+D1 <- read.csv('intelligent_tutor.csv')
+
 ```
 
 ##Classification Tree
@@ -60,18 +61,44 @@ plot(score_ctree)
 
 Please interpret the tree, which two behaviors do you think the teacher should most closely pay attemtion to?
 
+Interpretation:
+1. First of all, students are clutered according to their hints, studnets who did not ask for hints are clustered to group (2), and those asked for hints are clustered to group(5).
+
+2. For students in group(2), who ask for no hints, they are clustered into Node 3 and Node 4, based on the number of problems completed in the previous section. 
+In Node 3, 145 students completed less than 85 problems and not asking for hints are clustered within.
+In Node 4, 76 students completed more than 85 probblems in the previous section and not asking for hints are clustered within. 
+
+3. As for students who did ask for hints, they are clustered based on the cuttoff at 12.
+In Node 9, 46 studnets who asked more than 12 hints are clustered within. 
+And students asked for less than 12 hints are clustered as group(6) primarily. 
+
+4. In group(6), students are clustered into Node 8 and Node 7 based on students' correctness completeing the previous session. 
+In Node 8, 45 studnets who have more than 0.629 correcteness and ask for less than 12 hints are clustered within. 
+In Node 7, 66 students who have less than 0.629 correctness and ask for less than 12 hints are clustered within.
+
+Students fall into Node 7 and Node 9 need the teacher to pay the most attention to, and in Node 7 students ask for more than 12 hints and in Node 9 students though ask for less than 12 hints yet have correctness less than 0.629 in the previous session, and both of the nodes have the ratio of intervention reaching more than 0.2.
+
+
 #Test Tree
 Upload the data "intelligent_tutor_new.csv". This is a data set of a differnt sample of students doing the same problems in the same system. We can use the tree we built for the previous data set to try to predict the "advice" we should give the teacher about these new students. 
 
 ```{r}
 #Upload new data
 
-D2 <- 
+D2 <- read.csv('intelligent_tutor_new.csv')
 
 #Generate predicted advice for new students based on tree generated from old students
 
 D2$prediction <- predict(score_ctree, D2)
-
+D2
 ``` 
 ## Part III
 Compare the predicted advice with the actual advice that these studnts recieved. What is the difference between the observed and predicted results?
+```{r}
+D2$advice <- ifelse(D2$score <=0.4, "intervene", ifelse(D2$score > 0.4 & D2$score <=0.8, "monitor", "no action"))
+
+D3<- ifelse(D2$prediction==D2$advice,1,0)
+sum(D3)/length(D3)
+
+```
+In the new dataset, 58% of the students are predicted correctly regarding actions. 
